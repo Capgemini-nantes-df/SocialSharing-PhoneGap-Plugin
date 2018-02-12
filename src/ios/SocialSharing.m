@@ -387,7 +387,7 @@ static NSString *const kShareOptionUrl = @"url";
           else
           {
               mimeType = (NSString*)[[[basename substringFromIndex:rangeData.location+rangeData.length] componentsSeparatedByString: @";"] objectAtIndex:0];
-              
+
               //Find df anywhere in string
               NSRange rangeDF = [basename rangeOfString:@"df:"];
               //If not found fallback to default name
@@ -398,8 +398,8 @@ static NSString *const kShareOptionUrl = @"url";
                   //Found, apply name
                   fileName = (NSString*)[[[basename substringFromIndex:rangeDF.location+rangeDF.length] componentsSeparatedByString: @";"] objectAtIndex:0];
               }
-              
-              
+
+
               NSString *base64content = (NSString*)[[basename componentsSeparatedByString: @","] lastObject];
               data = [SocialSharing dataFromBase64String:base64content];
           }
@@ -421,7 +421,17 @@ static NSString *const kShareOptionUrl = @"url";
 }
 
 - (UIViewController*) getTopMostViewController {
-  UIViewController *presentingViewController = [[[UIApplication sharedApplication] delegate] window].rootViewController;
+  UIWindow *myTopWindow;
+  NSArray *windows = [UIApplication sharedApplication].windows;
+
+  // check all windows that really are UIWindow types to find the top one
+  for (id myWindow in windows) {
+    if ([myWindow class] == [UIWindow class]) {
+      myTopWindow = ((UIWindow*)myWindow);
+    }
+  }
+
+  UIViewController *presentingViewController = myTopWindow.rootViewController;
   while (presentingViewController.presentedViewController != nil) {
     presentingViewController = presentingViewController.presentedViewController;
   }
@@ -738,7 +748,7 @@ static NSString *const kShareOptionUrl = @"url";
      } else if (rangeData.location != NSNotFound ){
         //If found "data:"
         NSString *fileType  = (NSString*)[[[fileName substringFromIndex:rangeData.location+rangeData.length] componentsSeparatedByString: @";"] objectAtIndex:0];
-        
+
         NSString* attachmentName;
         //Find df anywhere in string
         NSRange rangeDF = [fileName rangeOfString:@"df:"];
@@ -750,8 +760,8 @@ static NSString *const kShareOptionUrl = @"url";
             //Found, apply name
             attachmentName = (NSString*)[[[fileName substringFromIndex:rangeDF.location+rangeDF.length] componentsSeparatedByString: @";"] objectAtIndex:0];
         }
-        
-        
+
+
         NSString *base64content = (NSString*)[[fileName componentsSeparatedByString: @","] lastObject];
         NSData* data = [SocialSharing dataFromBase64String:base64content];
         file = [NSURL fileURLWithPath:[self storeInFile:attachmentName fileData:data]];
